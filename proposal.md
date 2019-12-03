@@ -1,8 +1,15 @@
 
+The goal of this project is to generate C programs which interface with struct-based APIs using the [imperative-edsl](http://hackage.haskell.org/package/imperative-edsl-0.8) Haskell library. Currently the library supports generation of C code manipulating basic data types (int, bool, etc.), arrays and pointers. In this project, we aim to extend it with struct types, and further use this extension to program _existing_ struct-based C APIs. One such API of interest to the project is the [device driver API](https://docs.zephyrproject.org/latest/reference/drivers/index.html) offered by Zephyr OS.
+
 ## Extending `imperative-edsl` with struct types
+
+The first phase of the project would be dedicated to extending the imperative-edsl library with primitives which support code generation for struct types.
 
 ### Simple struct values
 
+We would like to generate a C program, such as the following, by writing a Haskell program which uses the library (see below). In the following example, the programs compute the distance between two _points_, where a point is implemented as a struct type.
+
+_Desired C code_
 ```C
 
 /* Define a struct type called "point". */
@@ -29,6 +36,7 @@ int main(){
 }
 ```
 
+_Haskell program which uses imperative-edsl_
 ```Haskell
 
 data Point = Point {
@@ -36,6 +44,7 @@ data Point = Point {
   y :: Int32
 }
 
+mainC :: Program StructCMD (Param2 exp CType) ()
 mainC = do
 
   p <- initSt "p" (Point 1 2)
@@ -48,8 +57,17 @@ mainC = do
   return ()
 ```
 
+Ideally, this phase involves the following subgoals:
+
+- Designing a Haskell interface for programming structs containing fields of basic types
+- Generating struct definitions from the Haskell interface
+- Generating code for creating and accessing struct values from the Haskell interface
+
 ### Pointers to struct values
 
+The library currently [supports pointers](http://hackage.haskell.org/package/imperative-edsl-0.8/docs/Language-Embedded-Imperative-CMD.html#g:4) for basic data types. The next step is to extend this pointer API for creating and dereferencing struct pointers. For example, we would like to generate C code such as the following: 
+
+_Desired C code_
 ```C
 
 /* Swap x and y */
@@ -68,8 +86,22 @@ int main(){
 
 ```
 
-## Interfacing with struct APIs
+With the ability to manipulate struct pointers, the next step would be to support struct definitions with self-referential fields, such as the following:
 
+_Desired C code_
+```C
+struct Node { 
+  int data; 
+  struct Node *next; 
+}; 
+
+```
+
+## Interfacing with struct APIs using `imperative-edsl`
+
+In the second phase, we seek to use our extension from the first phase to generate programs which use struct APIs, such as the following: 
+
+_Desired C code_
 ```C
 
 #include <zephyr.h>
@@ -98,3 +130,5 @@ void main(void){
   }
 }
 ```
+
+This program (called _blinky_) uses the device driver API provided by Zephyr OS to blink the LED on a device supported by Zephyr. Note that, unlike the previous examples, the struct definition is not generated, but instead simply imported using the appropriate header files. The main challenge here is to interact with an _existing_ API which uses structs, from programs written using imperative-edsl. What should the Haskell program look like? :)
