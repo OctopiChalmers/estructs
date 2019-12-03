@@ -1,5 +1,5 @@
 
-## Extending `imperative-edsl` with struct types
+## Simple struct values
 
 ```C
 
@@ -45,3 +45,24 @@ mainC = do
   
   return ()
 ```
+
+## Struct pointers
+
+```C
+
+/* Swap x and y */
+void swap(point *r){
+  int temp = r->x;
+  r->x = r->y;
+  r->y = temp;
+}
+
+int main(){
+  ... 
+  swap(&mid);
+  ...
+}
+
+```
+
+
