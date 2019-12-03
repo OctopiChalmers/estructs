@@ -41,7 +41,7 @@ mainC = do
   
   sx  <- fmap (+) (get @"x" p) <*> (get @"x" q)
   sy  <- fmap (+) (get @"y" p) <*> (get @"y" q)
-  mid <- initRef $ sqrt(sx / 2 + sy / 2);
+  mid <- initStruct "mid" $ Point (sx / 2) (sy / 2)
   
   return ()
 ```
