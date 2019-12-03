@@ -36,12 +36,12 @@ data Point = Point {
 
 mainC = do
 
-  p <- initStruct "p" (Point 1 2)
-  q <- initStruct "q" (Point 3 4)
+  p <- initSt "p" (Point 1 2)
+  q <- initSt "q" (Point 3 4)
   
   sx  <- fmap (+) (get @"x" p) <*> (get @"x" q)
   sy  <- fmap (+) (get @"y" p) <*> (get @"y" q)
-  mid <- initStruct "mid" $ Point (sx / 2) (sy / 2)
+  mid <- initSt "mid" $ Point (sx / 2) (sy / 2)
   
   return ()
 ```
